@@ -2,14 +2,66 @@ function main
 
 %testing matrix M
 global M
-M=[0 0 1 1 2 3 4;
-   1 0 1 2 4 5 3;
-   3 3 10 3 4 2 6;
-   5 6 7 30 0 1 1];
-
+% M=[0 0 1 1 2 3 4;
+%    1 0 1 2 4 5 3;
+%    3 3 10 3 4 2 6;
+%    5 6 7 30 0 1 1];
+% M=score_mat;
 %find path going rightward/downward and with min val 
-path=minPath3(M);
+load result_l_30_camera1_1_camera1_2
+M=score_mat;
+
+global minVal
+minVal=10e10;
+
+global minPath3_count
+minPath3_count=0;
+
+path=minPath4(M);
 path
+
+
+path_vis=zeros(size(M));
+for i=1:size(path,1)
+    x=path(i,1);
+    y=path(i,2);
+    path_vis(x,y)=1;
+end
+
+figure
+imagesc(path_vis)
+
+end
+
+
+
+function  path=minPath4(M)
+num=3;
+P=[];
+for i=1:size(M,1)
+    
+    [V,I]=sort(M(i,:));
+    
+    a=I(1:num);
+    app=[ones(num,1)*i a'];
+    P=[P;app];
+    
+end
+    
+
+
+
+path_vis=zeros(size(M));
+for i=1:size(P,1)
+    x=P(i,1);
+    y=P(i,2);
+    path_vis(x,y)=1/M(x,y);
+end
+
+figure
+imagesc(path_vis)
+
+
 
 end
 
@@ -25,7 +77,7 @@ targetLen=min(n,m);
 
 a=1;b=1;
 Q=getQ(M,a,b);
-[path,val]=minPath3R(M,a,b,0,Q);
+[path,val]=minPath3R(M,a,b,0,Q,0);
 
 path
 val
@@ -33,8 +85,9 @@ val
 end
 
 %recursively get path with min val, in M(a:end,b:end) starting (a,b);
-function [path,val]=minPath3R(M,a,b,len,Q)
-
+function [path,val]=minPath3R(M,a,b,len,Q,currVal)
+global minVal
+global minPath3_count
 
 global targetLen
 
@@ -42,6 +95,21 @@ path=[];
 val=0;
 
 if len==targetLen
+    minPath3_count=minPath3_count+1;
+    minPath3_count
+    
+    
+    if currVal<minVal
+        minVal=currVal;
+        minVal
+    end
+    
+    return;
+end
+
+if currVal>minVal
+    currVal
+    minVal
     return;
 end
 
@@ -57,6 +125,7 @@ numQ=size(Q,1);
 path1s={};
 vals=zeros(numQ,1);
 for i=1:size(Q,1)
+    
     x=Q(i,1);
     y=Q(i,2);
     M1=M(x:end,y:end);
@@ -64,7 +133,7 @@ for i=1:size(Q,1)
     Qtemp=Q;
     Qtemp(i,:)=[];
     
-    [path1, val]=minPath3R(M,x,y,len+1,Qtemp);
+    [path1, val]=minPath3R(M,x,y,len+1,Qtemp,currVal+M(x,y));
     path1s{end+1}=path1;
     vals(i)=val+M(x,y);
     
@@ -214,7 +283,7 @@ ab=a+b;
 
 path=[path; append];
 temp=path;
-for i=1:length(path)
+for i=1:size(path,1)
     if i>1 && I(i)==I(i-1)
         i=i+1;
     end
