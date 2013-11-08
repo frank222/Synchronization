@@ -9,7 +9,7 @@ path=minPath3(M);
 path
 end
 
-
+%recursive solution
 function path=minPath3(M)
 
 
@@ -76,8 +76,7 @@ for i=1:size(Q,1)
     
 end
 
-vals
-path1s
+
 [v,i]=min(vals);
 path=[Q(i,:); path1s{i}];
 val=v;
@@ -139,7 +138,8 @@ end
 
 
 
-
+%fast but naive solution - strong assumption of matrix M: increase
+%diagnoally
 function path=minPath2(M)
 
 n=size(M,1);
@@ -231,7 +231,7 @@ path=temp;
 end
 
 
-
+%CMA-ES solution, not garantee global optimum
 function path= minPath1(M)
 
 n=size(M,1);
